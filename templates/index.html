@@ -10,21 +10,35 @@
         body{
             background:#1b1f24;
             color:white;
-            text-align:center;
             font-family:Arial, sans-serif;
-            padding-top:20px;
+            margin:0;
+            padding:0;
+        }
+
+        .main-container{
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            gap:100px;
+            margin-top:40px;
+            padding:30px;
+        }
+
+        .left-section{
+            width:55%;
+            text-align:center;
+        }
+
+        .right-section{
+            display:flex;
+            flex-direction:column;
+            align-items:center;
         }
 
         h1{
             font-size:50px;
             color:cyan;
             text-shadow:0 0 15px cyan;
-        }
-
-        .hangman-art{
-            color:#ff4d4d;
-            font-size:22px;
-            margin-top:20px;
         }
 
         .hint{
@@ -56,8 +70,9 @@
             box-shadow:0 0 10px cyan;
         }
 
-        h2,h3{
-            margin-top:15px;
+        .guessed{
+            margin-top:20px;
+            font-size:22px;
         }
 
         .message{
@@ -78,10 +93,6 @@
             color:white;
             box-shadow:0 0 12px cyan;
             margin-top:20px;
-        }
-
-        input::placeholder{
-            color:#cccccc;
         }
 
         button{
@@ -120,71 +131,102 @@
             transform:scale(1.08);
         }
 
+        .hangman-art{
+            font-size:28px;
+            color:#ff4d4d;
+            background:#2b3138;
+            padding:20px;
+            border-radius:20px;
+            box-shadow:0 0 15px rgba(255,0,0,0.5);
+        }
+
+        .score{
+            margin-top:20px;
+            color:#00ffcc;
+            font-size:28px;
+        }
+
     </style>
 
 </head>
 
 <body>
 
-    <h1>Hangman Game 👾🎮</h1>
+    <div class="main-container">
 
-    <pre class="hangman-art">
-{{ hangman }}
-    </pre>
+        <!-- LEFT -->
 
-    <h3 class="hint">
-        💡 Hint: {{ hint }}
-    </h3>
+        <div class="left-section">
 
-    <div class="word-container">
+            <h1>Hangman Game 👾🎮</h1>
 
-        {% for letter in display.split() %}
+            <h3 class="hint">
+                💡 Hint: {{ hint }}
+            </h3>
 
-            <div class="letter-box">
-                {{ letter }}
+            <div class="word-container">
+
+                {% for letter in display.split() %}
+
+                    <div class="letter-box">
+                        {{ letter }}
+                    </div>
+
+                {% endfor %}
+
             </div>
 
-        {% endfor %}
+            <div class="guessed">
+                📝 Guessed Letters: {{ guessed }}
+            </div>
+
+            <div class="message">
+                {{ message }}
+            </div>
+
+            {% if chances > 0 and "_" in display %}
+
+            <form method="POST">
+
+                <input
+                    type="text"
+                    name="guess"
+                    maxlength="1"
+                    placeholder="Enter a letter"
+                    required
+                >
+
+                <br>
+
+                <button type="submit">
+                    Guess
+                </button>
+
+            </form>
+
+            {% endif %}
+
+            <a href="/reset" class="restart-btn">
+                🔄 Restart Game
+            </a>
+
+        </div>
+
+        <!-- RIGHT -->
+
+        <div class="right-section">
+
+            <pre class="hangman-art">
+{{ hangman }}
+            </pre>
+
+            <h2 class="score">
+                ❤️ Chances Left: {{ chances }}
+            </h2>
+
+        </div>
 
     </div>
-
-    <h2>
-        ❤️ Chances Left: {{ chances }}
-    </h2>
-
-    <h3>
-        📝 Guessed Letters: {{ guessed }}
-    </h3>
-
-    <div class="message">
-        {{ message }}
-    </div>
-
-    {% if chances > 0 and "_" in display %}
-
-    <form method="POST">
-
-        <input
-            type="text"
-            name="guess"
-            maxlength="1"
-            placeholder="Enter a letter"
-            required
-        >
-
-        <br>
-
-        <button type="submit">
-            Guess
-        </button>
-
-    </form>
-
-    {% endif %}
-
-    <a href="/reset" class="restart-btn">
-        🔄 Restart Game
-    </a>
 
 </body>
 

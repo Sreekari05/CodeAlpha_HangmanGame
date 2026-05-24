@@ -3,30 +3,31 @@ import random
 
 app = Flask(__name__)
 
-# Words and hints
+# WORDS + HINTS
 words = {
     "apple": "A fruit",
     "banana": "Yellow fruit",
     "juice": "A drink",
-    "extraordinary": "Something amazing",
-    "name": "Your identity",
     "mango": "King of fruits",
-    "beautiful": "Pretty",
-    "enjoy": "Have fun",
     "movie": "Cinema",
+    "beautiful": "Pretty",
     "television": "Watching device"
 }
 
-# Start game
+# START GAME
 def start_game():
+
     global word, hint, display, chances, guessed
 
     word = random.choice(list(words.keys()))
     hint = words[word]
 
     display = ["_"] * len(word)
+
     chances = 6
+
     guessed = []
+
 
 start_game()
 
@@ -34,11 +35,11 @@ start_game()
 @app.route("/", methods=["GET", "POST"])
 def home():
 
-    global word, display, chances, guessed
+    global word, hint, display, chances, guessed
 
     message = ""
 
-    # Hangman stages
+    # HANGMAN STAGES
     stages = [
 
 """
@@ -96,52 +97,57 @@ __|__
 """,
 
 """
-  
-  
-  
-  
-  
+     
+     
+     
+     
+     
 """
 ]
 
     if request.method == "POST":
 
-        # Stop guessing after game ends
-        if chances > 0 and "_" in display:
+        # GET INPUT
+        guess = request.form["guess"].lower()
 
-            guess = request.form["guess"].lower()
+        # ALREADY GUESSED
+        if guess in guessed:
 
-            # Repeated guess
-            if guess in guessed:
-                message = "Already guessed!"
+            message = "Already Guessed!"
 
+        else:
+
+            guessed.append(guess)
+
+            # CORRECT LETTER
+            if guess in word:
+
+                message = "Correct!"
+
+                for i in range(len(word)):
+
+                    if word[i] == guess:
+
+                        display[i] = guess
+
+            # WRONG LETTER
             else:
 
-                guessed.append(guess)
+                message = "Wrong!"
 
-                # Correct guess
-                if guess in word:
+                chances -= 1
 
-                    message = "Correct!"
-
-                    for i in range(len(word)):
-                        if word[i] == guess:
-                            display[i] = guess
-
-                # Wrong guess
-                else:
-                    message = "Wrong!"
-                    chances -= 1
-
-    # Win condition
+    # WIN
     if "_" not in display:
+
         message = "🎉 You Won!"
 
-    # Lose condition
-    elif chances <= 0:
+    # LOSE
+    if chances <= 0:
+
         message = f"💀 Game Over! Word was '{word}'"
 
-    # Hangman display
+    # HANGMAN
     hangman = stages[max(0, chances)]
 
     return render_template(
@@ -155,11 +161,15 @@ __|__
     )
 
 
+# RESET GAME
 @app.route("/reset")
 def reset():
+
     start_game()
+
     return redirect("/")
 
 
 if __name__ == "__main__":
+
     app.run(debug=True)
